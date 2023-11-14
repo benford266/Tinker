@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <TFT_eSPI.h> // Hardware-specific library
-#include <mcp_can.h>
+#include <mcp_can.h> // Library for using HSPI (none standard)
 
 
 TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
@@ -22,12 +22,13 @@ bool data_available() {
   return CAN0.checkReceive() == CAN_MSGAVAIL;
 }
 
+// Used for display update
 unsigned long startMillis;  //some global variables available anywhere in the program
 unsigned long currentMillis;
 const unsigned long period = 1000;  //the value is a number of milliseconds
 
 void setup(void) {
-
+// Start timer
 startMillis = millis();
 
 //Screen config
@@ -56,6 +57,7 @@ startMillis = millis();
 
 void loop() {
 
+// Updates display every 1 second
 currentMillis = millis();  //get the current "time" (actually the number of milliseconds since the program started)
   if (currentMillis - startMillis >= period)  //test whether the period has elapsed
   {
@@ -86,7 +88,7 @@ void CANRead(){
         }
         Serial.print(rxBuf[i], HEX);
         Serial.print(" ");
-    
+      // Looks for ID 0x3F9 
       if(rxId == 1017){
         tft.drawCentreString("CLT",110,80,4);
         tft.drawCentreString(String(rxBuf[4]) + "",210,80,4);
@@ -99,7 +101,7 @@ void CANRead(){
     }
 
 }
-
+// Function to update the display 
 void UpdateDisplay(){
   tft.setTextColor(TFT_PURPLE, TFT_BLACK);
   int wmipsi  = random(10,99);
